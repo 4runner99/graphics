@@ -6,6 +6,7 @@ static String no = "high";
         
         System.out.println(test);
         System.out.println(test);
+        System.out.println("new test again lol");
     }
     
 }
