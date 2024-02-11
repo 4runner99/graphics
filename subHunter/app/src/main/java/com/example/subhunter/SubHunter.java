@@ -188,8 +188,8 @@ public class SubHunter extends Activity {
 
         // Convert the float screen coordinates
         // into int grid coordinates
-        horizontalTouched = (int)touchX/ blockSize;
-        verticalTouched = (int)touchY/ blockSize;
+        horizontalTouched = (float) (int) touchX / blockSize;
+        verticalTouched = (float) (int) touchY / blockSize;
 
         // Did the shot hit the sub?
         hit = horizontalTouched == subHorizontalPosition
