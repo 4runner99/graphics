@@ -19,7 +19,7 @@ import android.widget.ImageView;
 import java.util.Random;
 
 
-public class SubHunter extends Activity {
+public class SubHunterMain extends Activity {
 
     // These variables can be "seen"
     // throughout the SubHunter class
