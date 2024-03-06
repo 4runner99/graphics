@@ -26,6 +26,8 @@ class SnakeGame extends SurfaceView implements Runnable{
     private volatile boolean mPlaying = false;
     private volatile boolean mPaused = true;
 
+    private volatile boolean gamePaused = true;
+
     // for playing sound effects
     private SoundPool mSP;
     private int mEat_ID = -1;
@@ -47,6 +49,7 @@ class SnakeGame extends SurfaceView implements Runnable{
     private Snake mSnake;
     // And an apple
     private Apple mApple;
+
 
 
     // This is the constructor method that gets called
@@ -208,7 +211,10 @@ class SnakeGame extends SurfaceView implements Runnable{
             mPaint.setTextSize(120);
 
             // Draw the score
-            mCanvas.drawText("" + mScore, 20, 120, mPaint);
+            mCanvas.drawText("" + mScore, 2850, 120, mPaint);
+
+            // draw pause button
+
 
             // Draw the apple and the snake
             mApple.draw(mCanvas, mPaint);
