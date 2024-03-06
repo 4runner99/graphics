@@ -1,0 +1,230 @@
+Index: ../subHunter/app/src/main/java/com/example/subhunter/SubHunter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// This is our package\n// If you are copy & pasting the code then this line will probably be different to yours\n// If so, keep YOUR line- not this one\npackage com.example.subhunter;\n\n// These are all the classes of other people's\n// (Android) code that we use in Sub Hunt\nimport android.app.Activity;\nimport android.os.Bundle;\nimport android.view.MotionEvent;\nimport android.util.Log;\nimport android.graphics.Bitmap;\nimport android.graphics.Canvas;\nimport android.graphics.Color;\nimport android.graphics.Paint;\nimport android.graphics.Point;\nimport android.view.Display;\nimport android.widget.ImageView;\nimport java.util.Random;\n\n\npublic class SubHunter extends Activity {\n\n    // These variables can be \"seen\"\n    // throughout the SubHunter class\n    int numberHorizontalPixels;\n    int numberVerticalPixels;\n    int blockSize;\n    int gridWidth = 40;\n    int gridHeight;\n    float horizontalTouched = -100;\n    float verticalTouched = -100;\n    int subHorizontalPosition;\n    int subVerticalPosition;\n    boolean hit = false;\n    int shotsTaken;\n    int distanceFromSub;\n    boolean debugging = false;\n\n    // Here are all the objects(instances)\n    // of classes that we need to do some drawing\n    ImageView gameView;\n    Bitmap blankBitmap;\n    Canvas canvas;\n    Paint paint;\n\n\n    /*\n        Android runs this code just before\n        the app is seen by the player.\n        This makes it a good place to add\n        the code that is needed for\n        the one-time setup.\n     */\n\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n\n        // Get the current device's screen resolution\n        Display display = getWindowManager().getDefaultDisplay();\n        Point size = new Point();\n        display.getSize(size);\n\n        // Initialize our size based variables based on the screen resolution\n        numberHorizontalPixels = size.x;\n        numberVerticalPixels = size.y;\n        blockSize = numberHorizontalPixels / gridWidth;\n        gridHeight = numberVerticalPixels / blockSize;\n\n        // Initialize all the objects ready for drawing\n        blankBitmap = Bitmap.createBitmap(numberHorizontalPixels,\n                numberVerticalPixels,\n                Bitmap.Config.ARGB_8888);\n\n        canvas = new Canvas(blankBitmap);\n        gameView = new ImageView(this);\n        paint = new Paint();\n\n        // Tell Android to set our drawing\n        // as the view for this app\n        setContentView(gameView);\n\n        Log.d(\"Debugging\", \"In onCreate\");\n        newGame();\n        draw();\n    }\n\n    /*\n        This code will execute when a new\n        game needs to be started. It will\n        happen when the app is first started\n        and after the player wins a game.\n     */\n    void newGame(){\n        Random random = new Random();\n        subHorizontalPosition = random.nextInt(gridWidth);\n        subVerticalPosition = random.nextInt(gridHeight);\n        shotsTaken = 0;\n\n        Log.d(\"Debugging\", \"In newGame\");\n\n    }\n\n    /*\n        Here we will do all the drawing.\n        The grid lines, the HUD and\n        the touch indicator\n     */\n    void draw() {\n        gameView.setImageBitmap(blankBitmap);\n\n        // Wipe the screen with a white color\n        canvas.drawColor(Color.argb(255, 255, 255, 255));\n\n        // Change the paint color to black\n        paint.setColor(Color.argb(255, 0, 0, 0));\n\n        // Draw the vertical lines of the grid\n        for(int i = 0; i < gridWidth; i++){\n            canvas.drawLine(blockSize * i, 0,\n                    blockSize * i, numberVerticalPixels,\n                    paint);\n        }\n\n        // Draw the horizontal lines of the grid\n        for(int i = 0; i < gridHeight; i++){\n            canvas.drawLine(0, blockSize * i,\n                    numberHorizontalPixels, blockSize * i,\n                    paint);\n        }\n        // Draw the player's shot\n        canvas.drawRect(horizontalTouched * blockSize,\n                verticalTouched * blockSize,\n                (horizontalTouched * blockSize) + blockSize,\n                (verticalTouched * blockSize)+ blockSize,\n                paint );\n\n\n        // Re-size the text appropriate for the\n        // score and distance text\n        paint.setTextSize(blockSize * 2);\n        paint.setColor(Color.argb(255, 0, 0, 255));\n        canvas.drawText(\n                \"Shots Taken: \" + shotsTaken +\n                        \"  Distance: \" + distanceFromSub,\n                blockSize, blockSize * 1.75f,\n                paint);\n\n\n        Log.d(\"Debugging\", \"In draw\");\n        if (debugging) {\n            printDebuggingText();\n        }\n    }\n\n    /*\n        This part of the code will\n        handle detecting that the player\n        has tapped the screen\n     */\n    @Override\n    public boolean onTouchEvent(MotionEvent motionEvent) {\n        Log.d(\"Debugging\", \"In onTouchEvent\");\n        // Has the player removed their finger from the screen?\n        if((motionEvent.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {\n\n            // Process the player's shot by passing the\n            // coordinates of the player's finger to takeShot\n            takeShot(motionEvent.getX(), motionEvent.getY());\n        }\n\n        return true;\n    }\n\n\n    /*\n        The code here will execute when\n        the player taps the screen It will\n        calculate distance from the sub'\n        and determine a hit or miss\n     */\n    void takeShot(float touchX, float touchY){\n        Log.d(\"Debugging\", \"In takeShot\");\n\n        // Add one to the shotsTaken variable\n        shotsTaken ++;\n\n        // Convert the float screen coordinates\n        // into int grid coordinates\n        horizontalTouched = (float) (int) touchX / blockSize;\n        verticalTouched = (float) (int) touchY / blockSize;\n\n        // Did the shot hit the sub?\n        hit = horizontalTouched == subHorizontalPosition\n                && verticalTouched == subVerticalPosition;\n\n        // How far away horizontally and vertically\n        // was the shot from the sub\n        int horizontalGap = (int)horizontalTouched -\n                subHorizontalPosition;\n        int verticalGap = (int)verticalTouched -\n                subVerticalPosition;\n\n        // Use Pythagoras's theorem to get the\n        // distance travelled in a straight line\n        distanceFromSub = (int)Math.sqrt(\n                ((horizontalGap * horizontalGap) +\n                (verticalGap * verticalGap)));\n\n        // If there is a hit call boom\n        if(hit)\n            boom();\n        // Otherwise call draw as usual\n        else draw();\n    }\n\n    // This code says \"BOOM!\"\n    void boom(){\n\n        gameView.setImageBitmap(blankBitmap);\n\n        // Wipe the screen with a red color\n        canvas.drawColor(Color.argb(255, 255, 0, 0));\n\n        // Draw some huge white text\n        paint.setColor(Color.argb(255, 255, 255, 255));\n        paint.setTextSize(blockSize * 10);\n\n        canvas.drawText(\"BOOM!\", blockSize * 4,\n                blockSize * 14, paint);\n\n        // Draw some text to prompt restarting\n        paint.setTextSize(blockSize * 2);\n        canvas.drawText(\"Take a shot to start again\",\n                blockSize * 8,\n                blockSize * 18, paint);\n\n        // Start a new game\n        newGame();\n    }\n\n    // This code prints the debugging text\n    public void printDebuggingText(){\n        paint.setTextSize(blockSize);\n        canvas.drawText(\"numberHorizontalPixels = \"\n                        + numberHorizontalPixels,\n                50, blockSize * 3, paint);\n        canvas.drawText(\"numberVerticalPixels = \"\n                        + numberVerticalPixels,\n                50, blockSize * 4, paint);\n        canvas.drawText(\"blockSize = \" + blockSize,\n                50, blockSize * 5, paint);\n        canvas.drawText(\"gridWidth = \" + gridWidth,\n                50, blockSize * 6, paint);\n        canvas.drawText(\"gridHeight = \" + gridHeight,\n                50, blockSize * 7, paint);\n        canvas.drawText(\"horizontalTouched = \" +\n                        horizontalTouched, 50,\n                blockSize * 8, paint);\n        canvas.drawText(\"verticalTouched = \" +\n                        verticalTouched, 50,\n                blockSize * 9, paint);\n        canvas.drawText(\"subHorizontalPosition = \" +\n                        subHorizontalPosition, 50,\n                blockSize * 10, paint);\n        canvas.drawText(\"subVerticalPosition = \" +\n                        subVerticalPosition, 50,\n                blockSize * 11, paint);\n        canvas.drawText(\"hit = \" + hit,\n                50, blockSize * 12, paint);\n        canvas.drawText(\"shotsTaken = \" +\n                        shotsTaken,\n                50, blockSize * 13, paint);\n        canvas.drawText(\"debugging = \" + debugging,\n                50, blockSize * 14, paint);\n\n    }\n}\n
+===================================================================
+diff --git a/../subHunter/app/src/main/java/com/example/subhunter/SubHunter.java b/../subHunter/app/src/main/java/com/example/subhunter/SubHunter.java
+--- a/../subHunter/app/src/main/java/com/example/subhunter/SubHunter.java	
++++ b/../subHunter/app/src/main/java/com/example/subhunter/SubHunter.java	
+@@ -23,8 +23,8 @@
+ 
+     // These variables can be "seen"
+     // throughout the SubHunter class
+-    int numberHorizontalPixels;
+-    int numberVerticalPixels;
++    //int numberHorizontalPixels;
++    //int numberVerticalPixels;
+     int blockSize;
+     int gridWidth = 40;
+     int gridHeight;
+@@ -36,14 +36,15 @@
+     int shotsTaken;
+     int distanceFromSub;
+     boolean debugging = false;
+-
+-    // Here are all the objects(instances)
+-    // of classes that we need to do some drawing
+     ImageView gameView;
+     Bitmap blankBitmap;
+     Canvas canvas;
+     Paint paint;
+ 
++    renderGraphics renderer;
++    private SubLogic logic;
++
++
+ 
+     /*
+         Android runs this code just before
+@@ -63,10 +64,16 @@
+         display.getSize(size);
+ 
+         // Initialize our size based variables based on the screen resolution
+-        numberHorizontalPixels = size.x;
+-        numberVerticalPixels = size.y;
++        int numberHorizontalPixels = size.x;
++        int numberVerticalPixels = size.y;
+         blockSize = numberHorizontalPixels / gridWidth;
+         gridHeight = numberVerticalPixels / blockSize;
++        renderer = new renderGraphics(numberHorizontalPixels, numberVerticalPixels, blockSize, gridWidth);
++        renderer.setNumberHorizontalPixels(numberHorizontalPixels);
++        renderer.setNumberVerticalPixels(numberVerticalPixels);
++        renderer.setBlockSize(blockSize);
++        renderer.setGridWidth(gridWidth);
++        renderer.setGridHeight(gridHeight);
+ 
+         // Initialize all the objects ready for drawing
+         blankBitmap = Bitmap.createBitmap(numberHorizontalPixels,
+@@ -79,9 +86,12 @@
+ 
+         // Tell Android to set our drawing
+         // as the view for this app
++
++
+         setContentView(gameView);
+ 
+         Log.d("Debugging", "In onCreate");
++        logic = new SubLogic(gridWidth,gridHeight,blockSize);
+         newGame();
+         draw();
+     }
+@@ -93,9 +103,8 @@
+         and after the player wins a game.
+      */
+     void newGame(){
+-        Random random = new Random();
+-        subHorizontalPosition = random.nextInt(gridWidth);
+-        subVerticalPosition = random.nextInt(gridHeight);
++        logic.newGame();
++
+         shotsTaken = 0;
+ 
+         Log.d("Debugging", "In newGame");
+@@ -108,50 +117,12 @@
+         the touch indicator
+      */
+     void draw() {
+-        gameView.setImageBitmap(blankBitmap);
+-
+-        // Wipe the screen with a white color
+-        canvas.drawColor(Color.argb(255, 255, 255, 255));
+-
+-        // Change the paint color to black
+-        paint.setColor(Color.argb(255, 0, 0, 0));
+-
+-        // Draw the vertical lines of the grid
+-        for(int i = 0; i < gridWidth; i++){
+-            canvas.drawLine(blockSize * i, 0,
+-                    blockSize * i, numberVerticalPixels,
+-                    paint);
+-        }
++        // Render the grid
++        Bitmap gridBitmap = renderer.drawGrid();
++        gameView.setImageBitmap(gridBitmap);
+ 
+-        // Draw the horizontal lines of the grid
+-        for(int i = 0; i < gridHeight; i++){
+-            canvas.drawLine(0, blockSize * i,
+-                    numberHorizontalPixels, blockSize * i,
+-                    paint);
+-        }
+-        // Draw the player's shot
+-        canvas.drawRect(horizontalTouched * blockSize,
+-                verticalTouched * blockSize,
+-                (horizontalTouched * blockSize) + blockSize,
+-                (verticalTouched * blockSize)+ blockSize,
+-                paint );
+-
+-
+-        // Re-size the text appropriate for the
+-        // score and distance text
+-        paint.setTextSize(blockSize * 2);
+-        paint.setColor(Color.argb(255, 0, 0, 255));
+-        canvas.drawText(
+-                "Shots Taken: " + shotsTaken +
+-                        "  Distance: " + distanceFromSub,
+-                blockSize, blockSize * 1.75f,
+-                paint);
+-
+-
+-        Log.d("Debugging", "In draw");
+-        if (debugging) {
+-            printDebuggingText();
+-        }
++        // Render the player shot and HUD
++        renderer.drawPlayerShot(horizontalTouched, verticalTouched, distanceFromSub, shotsTaken);
+     }
+ 
+     /*
+@@ -188,8 +159,8 @@
+ 
+         // Convert the float screen coordinates
+         // into int grid coordinates
+-        horizontalTouched = (float) (int) touchX / blockSize;
+-        verticalTouched = (float) (int) touchY / blockSize;
++        horizontalTouched = (int)touchX/ blockSize;
++        verticalTouched = (int)touchY/ blockSize;
+ 
+         // Did the shot hit the sub?
+         hit = horizontalTouched == subHorizontalPosition
+@@ -206,74 +177,26 @@
+         // distance travelled in a straight line
+         distanceFromSub = (int)Math.sqrt(
+                 ((horizontalGap * horizontalGap) +
+-                (verticalGap * verticalGap)));
++                        (verticalGap * verticalGap)));
+ 
+         // If there is a hit call boom
+         if(hit)
+             boom();
+-        // Otherwise call draw as usual
++            // Otherwise call draw as usual
+         else draw();
+     }
+ 
++
+     // This code says "BOOM!"
+     void boom(){
+-
+-        gameView.setImageBitmap(blankBitmap);
+-
+-        // Wipe the screen with a red color
+-        canvas.drawColor(Color.argb(255, 255, 0, 0));
+-
+-        // Draw some huge white text
+-        paint.setColor(Color.argb(255, 255, 255, 255));
+-        paint.setTextSize(blockSize * 10);
+-
+-        canvas.drawText("BOOM!", blockSize * 4,
+-                blockSize * 14, paint);
+-
+-        // Draw some text to prompt restarting
+-        paint.setTextSize(blockSize * 2);
+-        canvas.drawText("Take a shot to start again",
+-                blockSize * 8,
+-                blockSize * 18, paint);
++        Bitmap gridBitmap = renderer.showBoomscreen();
++        renderer.showBoomscreen();
++        gameView.setImageBitmap(gridBitmap);
+ 
+         // Start a new game
+         newGame();
+     }
+ 
+     // This code prints the debugging text
+-    public void printDebuggingText(){
+-        paint.setTextSize(blockSize);
+-        canvas.drawText("numberHorizontalPixels = "
+-                        + numberHorizontalPixels,
+-                50, blockSize * 3, paint);
+-        canvas.drawText("numberVerticalPixels = "
+-                        + numberVerticalPixels,
+-                50, blockSize * 4, paint);
+-        canvas.drawText("blockSize = " + blockSize,
+-                50, blockSize * 5, paint);
+-        canvas.drawText("gridWidth = " + gridWidth,
+-                50, blockSize * 6, paint);
+-        canvas.drawText("gridHeight = " + gridHeight,
+-                50, blockSize * 7, paint);
+-        canvas.drawText("horizontalTouched = " +
+-                        horizontalTouched, 50,
+-                blockSize * 8, paint);
+-        canvas.drawText("verticalTouched = " +
+-                        verticalTouched, 50,
+-                blockSize * 9, paint);
+-        canvas.drawText("subHorizontalPosition = " +
+-                        subHorizontalPosition, 50,
+-                blockSize * 10, paint);
+-        canvas.drawText("subVerticalPosition = " +
+-                        subVerticalPosition, 50,
+-                blockSize * 11, paint);
+-        canvas.drawText("hit = " + hit,
+-                50, blockSize * 12, paint);
+-        canvas.drawText("shotsTaken = " +
+-                        shotsTaken,
+-                50, blockSize * 13, paint);
+-        canvas.drawText("debugging = " + debugging,
+-                50, blockSize * 14, paint);
+ 
+-    }
+ }
