@@ -3,6 +3,8 @@ package com.example.snake;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -45,10 +47,15 @@ class SnakeGame extends SurfaceView implements Runnable{
     private SurfaceHolder mSurfaceHolder;
     private Paint mPaint;
 
+    private Bitmap pauseButtonBitmap;
+
     // A snake ssss
     private Snake mSnake;
     // And an apple
     private Apple mApple;
+    private float pauseButtonX = 50;
+
+    private float pauseButtonY = 20;
 
 
 
@@ -106,6 +113,8 @@ class SnakeGame extends SurfaceView implements Runnable{
                         mNumBlocksHigh),
                 blockSize);
 
+        Bitmap originalPauseButtonBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pausebutton);
+        pauseButtonBitmap = Bitmap.createScaledBitmap(originalPauseButtonBitmap, 128, 128, true);
     }
 
 
@@ -192,6 +201,7 @@ class SnakeGame extends SurfaceView implements Runnable{
             mSP.play(mCrashID, 1, 1, 0, 0, 1);
 
             mPaused =true;
+            
         }
 
     }
@@ -220,6 +230,9 @@ class SnakeGame extends SurfaceView implements Runnable{
             mApple.draw(mCanvas, mPaint);
             mSnake.draw(mCanvas, mPaint);
 
+            mCanvas.drawBitmap(pauseButtonBitmap, pauseButtonX, pauseButtonY, mPaint);
+
+
             // Draw some text while paused
             if(mPaused){
 
@@ -232,7 +245,7 @@ class SnakeGame extends SurfaceView implements Runnable{
                 //mCanvas.drawText("Tap To Play!", 200, 700, mPaint);
                 mCanvas.drawText(getResources().
                                 getString(R.string.tap_to_play),
-                        200, 700, mPaint);
+                        800, 700, mPaint);
             }
 
 
@@ -246,23 +259,36 @@ class SnakeGame extends SurfaceView implements Runnable{
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
                 if (mPaused) {
+                    // Resume the game if it was paused
                     mPaused = false;
                     newGame();
-
-                    // Don't want to process snake direction for this tap
                     return true;
-                }
+                } else {
+                    // Check if the touch event is within the pause button region
+                    float touchX = motionEvent.getX();
+                    float touchY = motionEvent.getY();
 
-                // Let the Snake class handle the input
-                mSnake.switchHeading(motionEvent);
+                    // Check if touch event coordinates are within the bounds of the pause button
+                    if (touchX >= pauseButtonX && touchX <= pauseButtonX + 128 &&
+                            touchY >= pauseButtonY && touchY <= pauseButtonY + 128) {
+                        // Toggle the paused state
+                        mPaused = true;
+                        // Optionally, you may want to display a pause menu or overlay
+                        // Pause the game logic here
+                        return true;
+                    } else {
+                        // Let the Snake class handle the input
+                        mSnake.switchHeading(motionEvent);
+                    }
+                }
                 break;
 
             default:
                 break;
-
         }
         return true;
     }
+
 
 
     // Stop the thread
