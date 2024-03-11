@@ -2,7 +2,10 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="SubHunter.app">
+      <entry key="Snake.app">
+        <State />
+      </entry>
+      <entry key="SnakeActivity">
         <State />
       </entry>
     </value>
