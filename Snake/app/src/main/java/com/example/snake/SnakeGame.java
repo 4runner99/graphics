@@ -13,6 +13,7 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -48,6 +49,8 @@ class SnakeGame extends SurfaceView implements Runnable{
     private Paint mPaint;
 
     private Bitmap pauseButtonBitmap;
+
+    private Bitmap backgroundBitmap;
 
     // A snake ssss
     private Snake mSnake;
@@ -115,6 +118,32 @@ class SnakeGame extends SurfaceView implements Runnable{
 
         Bitmap originalPauseButtonBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pausebutton);
         pauseButtonBitmap = Bitmap.createScaledBitmap(originalPauseButtonBitmap, 128, 128, true);
+
+
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int screenWidth = displayMetrics.widthPixels;
+        int screenHeight = displayMetrics.heightPixels;
+
+
+        int backgroundWidth = 3120;
+        int backgroundHeight = 1440;
+
+// Calculate the scaling factors
+        float scaleX = (float) screenWidth / backgroundWidth;
+        float scaleY = (float) screenHeight / backgroundHeight;
+
+// Choose the larger scaling factor to ensure the entire image covers the screen
+        float scaleFactor = Math.max(scaleX, scaleY);
+
+// Calculate the scaled dimensions of the background image
+        int scaledWidth = (int) (backgroundWidth * scaleFactor);
+        int scaledHeight = (int) (backgroundHeight * scaleFactor);
+
+// Load the scaled bitmap using BitmapFactory.Options
+        backgroundBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), scaledWidth, scaledHeight, true);
+
+
+
     }
 
 
@@ -213,8 +242,10 @@ class SnakeGame extends SurfaceView implements Runnable{
         if (mSurfaceHolder.getSurface().isValid()) {
             mCanvas = mSurfaceHolder.lockCanvas();
 
+
+            mCanvas.drawBitmap(backgroundBitmap, 0, 0, mPaint); // Adjust the position if necessary
             // Fill the screen with a color
-            mCanvas.drawColor(Color.argb(255, 26, 128, 182));
+            //mCanvas.drawColor(Color.argb(255, 26, 128, 182));
 
             // Set the size and color of the mPaint for the text
             mPaint.setColor(Color.argb(255, 255, 255, 255));
@@ -223,13 +254,12 @@ class SnakeGame extends SurfaceView implements Runnable{
             // Draw the score
             mCanvas.drawText("" + mScore, 2850, 120, mPaint);
 
-            // draw pause button
 
 
             // Draw the apple and the snake
             mApple.draw(mCanvas, mPaint);
             mSnake.draw(mCanvas, mPaint);
-
+            // draw pause button
             mCanvas.drawBitmap(pauseButtonBitmap, pauseButtonX, pauseButtonY, mPaint);
 
 
@@ -253,6 +283,8 @@ class SnakeGame extends SurfaceView implements Runnable{
             mSurfaceHolder.unlockCanvasAndPost(mCanvas);
         }
     }
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
