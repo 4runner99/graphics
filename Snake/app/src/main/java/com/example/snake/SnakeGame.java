@@ -249,10 +249,11 @@ class SnakeGame extends SurfaceView implements Runnable{
 
             // Set the size and color of the mPaint for the text
             mPaint.setColor(Color.argb(255, 255, 255, 255));
-            mPaint.setTextSize(120);
+            mPaint.setTextSize(90);
 
             // Draw the score
-            mCanvas.drawText("" + mScore, 2850, 120, mPaint);
+            mCanvas.drawText("Julian Bucio     Tyler Judt-Martine", 1600, 120, mPaint);
+            mCanvas.drawText(" Points: " + mScore, 1000, 120, mPaint);
 
 
 
