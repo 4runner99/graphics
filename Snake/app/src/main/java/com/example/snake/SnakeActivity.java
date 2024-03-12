@@ -9,7 +9,7 @@ public class SnakeActivity extends Activity {
 
     // Declare an instance of SnakeGame
     SnakeGame mSnakeGame;
-
+    //TEST GIT
     // Set the game up
     @Override
     protected void onCreate(Bundle savedInstanceState) {
