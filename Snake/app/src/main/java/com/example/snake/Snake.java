@@ -14,8 +14,14 @@ class Snake extends GameObject {
         super(context, mr, ss, R.drawable.head);
     }
 
+
+    public void spawn() {
+
+    }
+
     // Get the snake ready for a new game
-    void reset(int w, int h) {
+    @Override
+   public void spawn(int w, int h) {
 
         // Reset the heading
         heading = Heading.RIGHT;
@@ -106,7 +112,7 @@ class Snake extends GameObject {
         return false;
     }
 
-    void draw(Canvas canvas, Paint paint) {
+    public void draw(Canvas canvas, Paint paint) {
 
         // Don't run this code if ArrayList has nothing in it
         if (!segmentLocations.isEmpty()) {

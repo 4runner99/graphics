@@ -14,11 +14,17 @@ class Apple extends GameObject {
     }
 
     // This is called every time an apple is eaten
-    void spawn(){
+    @Override
+    public void spawn(){
         // Choose two random values and place the apple
         Random random = new Random();
         location.x = random.nextInt(mSpawnRange.x) + 1;
         location.y = random.nextInt(mSpawnRange.y - 1) + 1;
+    }
+
+
+    public void spawn(int w, int h) {
+
     }
 
     // Let SnakeGame know where the apple is
@@ -28,7 +34,7 @@ class Apple extends GameObject {
     }
 
     // Draw the apple
-    void draw(Canvas canvas, Paint paint){
+    public void draw(Canvas canvas, Paint paint){
         canvas.drawBitmap(bitmap,
                 location.x * mSize, location.y * mSize, paint);
     }

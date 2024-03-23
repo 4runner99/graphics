@@ -9,7 +9,7 @@ import android.graphics.Point;
 
 import java.util.ArrayList;
 
-public abstract class GameObject {
+public abstract class GameObject implements GameState{
     protected Point location;
 
     // The range of values we can choose from
