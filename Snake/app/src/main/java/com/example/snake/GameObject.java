@@ -8,6 +8,7 @@ import android.graphics.Point;
 
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public abstract class GameObject implements GameState{
     protected Point location;
@@ -124,4 +125,6 @@ public abstract class GameObject implements GameState{
         // Used to detect which side of screen was pressed
         halfWayPoint = sr.x * s / 2;
     }
+    public void spawn() {}
+    public void spawn(int w, int h) {}
 }

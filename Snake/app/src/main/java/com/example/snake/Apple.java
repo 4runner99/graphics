@@ -22,11 +22,6 @@ class Apple extends GameObject {
         location.y = random.nextInt(mSpawnRange.y - 1) + 1;
     }
 
-
-    public void spawn(int w, int h) {
-
-    }
-
     // Let SnakeGame know where the apple is
     // SnakeGame can share this with the snake
     Point getLocation(){

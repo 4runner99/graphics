@@ -14,24 +14,19 @@ class Snake extends GameObject {
         super(context, mr, ss, R.drawable.head);
     }
 
-
-    public void spawn() {
-
-    }
-
     // Get the snake ready for a new game
     @Override
-   public void spawn(int w, int h) {
+    public void spawn(int w, int h) {
 
-        // Reset the heading
-        heading = Heading.RIGHT;
+         // Reset the heading
+         heading = Heading.RIGHT;
 
-        // Delete the old contents of the ArrayList
-        segmentLocations.clear();
+         // Delete the old contents of the ArrayList
+         segmentLocations.clear();
 
-        // Start with a single snake segment
-        segmentLocations.add(new Point(w / 2, h / 2));
-    }
+         // Start with a single snake segment
+         segmentLocations.add(new Point(w / 2, h / 2));
+     }
 
 
     void move() {
