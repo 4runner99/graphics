@@ -62,9 +62,6 @@ class SnakeGame extends SurfaceView implements Runnable{
     private final float pauseButtonY = 20;
 
 
-
-
-
     // This is the constructor method that gets called
     // from SnakeActivity
     public SnakeGame(Context context, Point size) {
@@ -131,21 +128,19 @@ class SnakeGame extends SurfaceView implements Runnable{
         int backgroundWidth = 3120;
         int backgroundHeight = 1440;
 
-// Calculate the scaling factors
+        // Calculate the scaling factors
         float scaleX = (float) screenWidth / backgroundWidth;
         float scaleY = (float) screenHeight / backgroundHeight;
 
-// Choose the larger scaling factor to ensure the entire image covers the screen
+        // Choose the larger scaling factor to ensure the entire image covers the screen
         float scaleFactor = Math.max(scaleX, scaleY);
 
-// Calculate the scaled dimensions of the background image
+        // Calculate the scaled dimensions of the background image
         int scaledWidth = (int) (backgroundWidth * scaleFactor);
         int scaledHeight = (int) (backgroundHeight * scaleFactor);
 
-// Load the scaled bitmap using BitmapFactory.Options
+        // Load the scaled bitmap using BitmapFactory.Options
         backgroundBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), scaledWidth, scaledHeight, true);
-
-
 
     }
 

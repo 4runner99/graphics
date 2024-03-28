@@ -6,9 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.view.MotionEvent;
 
-import java.util.ArrayList;
-
-class Snake extends GameObject {
+class Snake extends GameObject implements Movable {
 
     Snake(Context context, Point mr, int ss) {
         super(context, mr, ss, R.drawable.head);
@@ -28,8 +26,8 @@ class Snake extends GameObject {
          segmentLocations.add(new Point(w / 2, h / 2));
      }
 
-
-    void move() {
+    @Override
+    public void move() {
         // Move the body
         // Start at the back and move it
         // to the position of the segment in front of it
@@ -106,7 +104,7 @@ class Snake extends GameObject {
         }
         return false;
     }
-
+    @Override
     public void draw(Canvas canvas, Paint paint) {
 
         // Don't run this code if ArrayList has nothing in it
