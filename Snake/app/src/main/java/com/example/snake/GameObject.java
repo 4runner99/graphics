@@ -8,9 +8,8 @@ import android.graphics.Point;
 
 
 import java.util.ArrayList;
-import java.util.Random;
 
-public abstract class GameObject implements GameState{
+public abstract class GameObject implements drawable {
     protected Point location;
 
     // The range of values we can choose from

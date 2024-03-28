@@ -6,9 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.view.MotionEvent;
 
-import java.util.ArrayList;
-
-class Snake extends GameObject {
+class Snake extends GameObject implements movable {
 
     Snake(Context context, Point mr, int ss) {
         super(context, mr, ss, R.drawable.head);
@@ -29,7 +27,7 @@ class Snake extends GameObject {
      }
 
 
-    void move() {
+    public void move() {
         // Move the body
         // Start at the back and move it
         // to the position of the segment in front of it
