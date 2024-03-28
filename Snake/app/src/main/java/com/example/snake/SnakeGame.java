@@ -21,6 +21,7 @@ import java.io.IOException;
 
 class SnakeGame extends SurfaceView implements Runnable{
 
+
     // Objects for the game loop/thread
     private Thread mThread = null;
     // Control pausing between updates
@@ -29,7 +30,7 @@ class SnakeGame extends SurfaceView implements Runnable{
     private volatile boolean isGamerunning = false;
     private volatile boolean newGamepaused = true;
 
-    private volatile boolean gamePaused = true;
+    private volatile boolean gamePaused = false;
 
     // for playing sound effects
     private SoundPool mSP;
@@ -146,7 +147,6 @@ class SnakeGame extends SurfaceView implements Runnable{
         backgroundBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.background), scaledWidth, scaledHeight, true);
 
 
-
     }
 
 
@@ -171,13 +171,12 @@ class SnakeGame extends SurfaceView implements Runnable{
     @Override
     public void run() {
         while (isGamerunning) {
-            if(!newGamepaused) {
+            if (!newGamepaused && !gamePaused) { // Check if the game is not paused
                 // Update 10 times a second
                 if (updateRequired()) {
                     update();
                 }
             }
-
             draw();
         }
     }
@@ -241,19 +240,24 @@ class SnakeGame extends SurfaceView implements Runnable{
 
     // Do all the drawing
     public void draw() {
-        // Get a lock on the mCanvas
+        // Get a lock on the canvas
         if (mSurfaceHolder.getSurface().isValid()) {
             mCanvas = mSurfaceHolder.lockCanvas();
 
             drawScoreandName();
             drawBitmaps();
 
-            // Draw some text while paused
-            if(newGamepaused){
+            // Draw pause text if the game is paused and it's not initially paused
+            if (gamePaused && !newGamepaused) {
+                drawPausedText();
+            }
+
+            // Draw "Tap to Play" text if it's initially paused
+            if (newGamepaused) {
                 drawTaptoPlay();
             }
 
-            // Unlock the mCanvas and reveal the graphics for this frame
+            // Unlock the canvas and reveal the graphics for this frame
             mSurfaceHolder.unlockCanvasAndPost(mCanvas);
         }
     }
@@ -286,7 +290,7 @@ class SnakeGame extends SurfaceView implements Runnable{
 
     private void drawTaptoPlay(){
         // Set the size and color of the mPaint for the text
-        mPaint.setColor(Color.argb(255, 255, 255, 255));
+        mPaint.setColor(Color.BLACK);
         mPaint.setTextSize(250);
         // Draw the message
         // We will give this an international upgrade soon
@@ -296,13 +300,15 @@ class SnakeGame extends SurfaceView implements Runnable{
 
     private void drawPausedText(){
         // Set the size and color of the mPaint for the text
-        mPaint.setColor(Color.argb(255, 255, 255, 255));
+        mPaint.setColor(Color.BLACK);
         mPaint.setTextSize(250);
-
         // Draw the message
         // We will give this an international upgrade soon
+        mCanvas.drawText("Paused!", 1100, 700, mPaint);
 
-        mCanvas.drawText("Paused!", 800, 700, mPaint);
+        mPaint.setTextSize(150);
+        mCanvas.drawText("Tap pause again to resume", 650, 900, mPaint);
+
     }
 
 
@@ -319,7 +325,6 @@ class SnakeGame extends SurfaceView implements Runnable{
                 } else {
                     // Let the Snake class handle the input
                     mSnake.switchHeading(motionEvent);
-
                 }
                 break;
 
@@ -331,14 +336,14 @@ class SnakeGame extends SurfaceView implements Runnable{
                 // Check if touch event coordinates are within the bounds of the pause button
                 if (touchX >= pauseButtonX && touchX <= pauseButtonX + 128 &&
                         touchY >= pauseButtonY && touchY <= pauseButtonY + 128) {
-                    newGamepaused = true;
+                    gamePaused = !gamePaused; // Toggle pause state
 
-                    drawPausedText();
-
-                    // Optionally, you may want to display a pause menu or overlay
-                    // Pause the game logic here
+                    if (gamePaused) {
+                        // Optionally, you may want to display a pause menu or overlay
+                        // Pause the game logic here
+                        drawPausedText();
+                    }
                     return true;
-
                 }
                 break;
 
